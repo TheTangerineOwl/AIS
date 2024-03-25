@@ -8,20 +8,22 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace wuf
+namespace AIS
 {
     public partial class MainForm : Form
     {
-        public MainForm()
+        readonly MenuLoader menu;
+        readonly User currentUser;
+        int index = 0;
+
+        public MainForm(User user, MenuLoader menu)
         {
+            this.menu = menu;
+            currentUser = user;
             InitializeComponent();
         }
 
-        MenuLoader menu = new MenuLoader();
-        User currentUser = new User("admin");////////////////////////////////////////////////////////
-        int index = 0;
-
-        private void Form1_Load(object sender, EventArgs e)
+        private void MainForm_Load(object sender, EventArgs e)
         {
             ToolStripMenuItem buffer = new ToolStripMenuItem();
             currentUser.SetPerms(menu);
@@ -78,14 +80,8 @@ namespace wuf
 
         private void OnClick(object sender, EventArgs e)
         {
-            WriteOnClick((ToolStripMenuItem)sender);
-        }
-
-        private void WriteOnClick(ToolStripMenuItem strip)
-        {
-            //outputLabel.Text = "Нажат \"" + strip.Text + "\"";    // то, что нужно
-
-            outputLabel.Text = strip.Tag.ToString();        // для теста
+            ToolStripMenuItem strip = (ToolStripMenuItem)sender;
+            outputLabel.Text = "Нажат \"" + strip.Text + "\"";
         }
 
 

@@ -7,9 +7,9 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace wuf
+namespace AIS
 {
-    internal class User
+    public class User
     {
         readonly List<string[]> perms;
 
@@ -55,8 +55,7 @@ namespace wuf
             }
         }
 
-        // заглушка для проверки формата записи пользователей в файл
-        public bool CorrectUsersFormat(string filename)
+        public static bool CorrectUsersFormat(string filename)
         {
             //List<string> content = new List<string>();
 

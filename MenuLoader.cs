@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace wuf
+namespace AIS
 {
-    internal class MenuLoader
+    public class MenuLoader
     {
         public int count = 0;
         List<string[]> itemArgs;
