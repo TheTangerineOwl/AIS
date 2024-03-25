@@ -1,17 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AIS
 {
+    /// <summary>
+    /// Класс для загрузки параметров меню из файла.
+    /// </summary>
     public class MenuLoader
     {
         public int count = 0;
         List<string[]> itemArgs;
 
+        /// <summary>
+        /// Класс для загрузки параметров меню из файла.
+        /// </summary>
+        /// <param name="filename">Имя файла с динамическими параметрами меню.</param>
+        /// <exception cref="FileNotFoundException"></exception>
+        /// <exception cref="FormatException"></exception>
         public MenuLoader(string filename = "menu.txt")
         {
             if (!File.Exists(filename))
@@ -29,14 +35,16 @@ namespace AIS
                 throw new FormatException($"Некорректный формат заполнения файла меню \"{filename}\"!");
         }
 
-        // Номер_уровня_в_иерархии Название_пункта Статус_пункта ИмяМетода
-
         public string[] this[int index]
         {
             get { return itemArgs[index]; }
             set { itemArgs[index] = value; }
         }
 
+        /// <summary>
+        /// Проверка корректности формата файла с параметрами меню.
+        /// </summary>
+        /// <returns>true, если формат корректный; иначе false.</returns>
         public bool CorrectFormat()
         {
             foreach (var args in itemArgs)

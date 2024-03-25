@@ -1,18 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AIS
 {
+    /// <summary>
+    /// Информация о пользователе и разрешениях для него.
+    /// </summary>
     public class User
     {
         readonly List<string[]> perms;
 
+        /// <summary>
+        /// Информация о разрешениях пользователя.
+        /// </summary>
+        /// <param name="login">Имя пользователя.</param>
+        /// <param name="filename">Имя файла с данными о пользователях.</param>
+        /// <exception cref="FileNotFoundException"></exception>
+        /// <exception cref="FormatException"></exception>
+        /// <exception cref="Exception"></exception>
         public User(string login, string filename = "USERS.txt")
         {
             if (!File.Exists(filename))
@@ -21,15 +28,13 @@ namespace AIS
             if (!CorrectUsersFormat(filename))
                 throw new FormatException($"Некорректный формат заполнения файла пользователей \"{filename}\"!");
 
-
-            // аутентификацию вставить
-
             using (StreamReader reader = new StreamReader(filename))
             {
+                // Поиск пользователя в файле.
                 while (!reader.ReadLine().StartsWith($"#{login}"));
                 if (reader.EndOfStream)
                     throw new Exception("Пользователь не найден!");
-
+                // Запись разрешений пользователя.
                 perms = new List<string[]>();
                 while (!reader.EndOfStream)
                 {
@@ -39,12 +44,15 @@ namespace AIS
                     perms.Add(str.Split('~'));
                 }
             }
-
+            // Если разрешения были считаны некорректно.
             if (!CorrectPermsFormat())
                 throw new FormatException($"Некорректный формат заполнения файла меню \"{filename}\": названия пунктов не могут повторяться!");
         }
 
-
+        /// <summary>
+        /// Редактирование динамического меню в соответствии с разрешениями пользователя.
+        /// </summary>
+        /// <param name="menu">Динамическое меню.</param>
         public void SetPerms(MenuLoader menu)
         {
             for (int i = 0; i < menu.count; i++)
@@ -55,33 +63,41 @@ namespace AIS
             }
         }
 
+        /// <summary>
+        /// Проверяет корректность формата файла с пользователями.
+        /// </summary>
+        /// <param name="filename">Имя файла с информацией о пользователях.</param>
+        /// <returns>true, если формат правильный; иначе false.</returns>
         public static bool CorrectUsersFormat(string filename)
         {
-            //List<string> content = new List<string>();
-
-            List<string> users = new List<string>();
+            List<string[]> users = new List<string[]>();
             using (StreamReader reader = new StreamReader(filename))
             {
+                // Считывает всех пользователей из файла.
                 string str;
                 while (!reader.EndOfStream)
                 {
                     str = reader.ReadLine();
                     if (str.StartsWith("#"))
-                        users.Add(str);
+                        users.Add(str.Split(' '));
                 }
             }
-            //List<string> users = content.FindAll(x => x.StartsWith("#"));
+            // Если не удалось найти пользователей или считать файл.
             if (users == null || users.Count == 0)
                 return false;
 
-            var buf = users.Distinct().ToList<string>();
-            if (!users.SequenceEqual(users.Distinct()))
-                return false;
-            
+            // Проверка, существуют ли совпадения в списке пользователей.
+            foreach (var buf in users)
+                if (users.FindAll(x => x[0] == buf[0]).Count > 1)
+                    return false;
+
             return true;
         }
 
-        // заглушка для проверки разрешений для данного пользователя
+        /// <summary>
+        /// Проверяет корректность формата разрешений для пользователя.
+        /// </summary>
+        /// <returns>true, если формат правильный; иначе false.</returns>
         public bool CorrectPermsFormat()
         {
             if (perms == null)
@@ -89,6 +105,7 @@ namespace AIS
             if (perms.Count == 0)
                 return true;
             perms.Sort((x, y) => string.Compare(x[0], y[0]));
+            // Если существуют повторы в пунктах с разрешениями.
             if (perms.Aggregate((x, y) => x[0] == y[0] ? y : x) != perms[0])
                 return false;
             foreach (var args in perms)
